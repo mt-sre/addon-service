@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/mt-sre/addon-service/api/v1";
+
+message Version {
+  string version = 1;
+  string branch = 2;
+  string commit = 3;
+  string go_version = 4;
+  string platform = 5;
+  google.protobuf.Timestamp build_time = 6;
+}
+
+service VersionService {
+  rpc Get(google.protobuf.Empty) returns (Version) {
+    option (google.api.http) = {
+      get: "/version"
+    };
+  };
+}
