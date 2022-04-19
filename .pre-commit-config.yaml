@@ -55,3 +55,8 @@ repos:
     exclude: ".*"
     pass_filenames: false
     always_run: true
+
+- repo: https://github.com/yoheimuta/protolint
+  rev: master
+  hooks:
+    - id: protolint
