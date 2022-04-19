@@ -4,6 +4,7 @@ package v1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 
 option go_package = "github.com/mt-sre/addon-service/api/v1";
 
@@ -16,10 +17,8 @@ message Version {
   google.protobuf.Timestamp buildTime = 6;
 }
 
-message VersionRequest {}
-
 service VersionService {
-  rpc Get(VersionRequest) returns (Version) {
+  rpc Get(google.protobuf.Empty) returns (Version) {
     option (google.api.http) = {
       get: "/version"
     };
