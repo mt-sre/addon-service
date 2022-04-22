@@ -3,6 +3,7 @@ module github.com/mt-sre/addon-service
 go 1.17
 
 require (
+	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0
 	github.com/magefile/mage v1.13.0
 	google.golang.org/genproto v0.0.0-20220414192740-2d67ff6cf2b4

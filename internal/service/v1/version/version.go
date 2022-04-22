@@ -1,10 +1,15 @@
 package version
 
 import (
+	"context"
 	"fmt"
 	"runtime"
 	"strconv"
 	"time"
+
+	v1 "github.com/mt-sre/addon-service/api/v1"
+	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // https://github.com/golang/go/issues/37369
@@ -20,19 +25,16 @@ var (
 	BuildDate = empty
 )
 
-// Info contains build information supplied during compile time.
-type Info struct {
-	Version   string    `json:"version"`
-	Branch    string    `json:"branch"`
-	Commit    string    `json:"commit"`
-	BuildDate time.Time `json:"buildTime"`
-	GoVersion string    `json:"goVersion"`
-	Platform  string    `json:"platform"`
+type VersionService struct {
+}
+
+func NewVersionService() *VersionService {
+	return &VersionService{}
 }
 
 // Get returns the build-in version and platform information
-func Get() Info {
-	v := Info{
+func (svc *VersionService) Get(_ context.Context, _ *emptypb.Empty) (*v1.Version, error) {
+	v := &v1.Version{
 		Version:   Version,
 		Branch:    Branch,
 		Commit:    Commit,
@@ -43,10 +45,9 @@ func Get() Info {
 	if BuildDate != empty {
 		i, err := strconv.ParseInt(BuildDate, 10, 64)
 		if err != nil {
-			panic(fmt.Errorf("error parsing build time: %w", err))
+			return &v1.Version{}, fmt.Errorf("error parsing build time: %w", err)
 		}
-		v.BuildDate = time.Unix(i, 0).UTC()
+		v.BuildTime = timestamppb.New(time.Unix(i, 0).UTC())
 	}
-
-	return v
+	return v, nil
 }
