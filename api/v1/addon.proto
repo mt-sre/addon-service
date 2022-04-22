@@ -1,0 +1,301 @@
+syntax = "proto3";
+
+package v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/mt-sre/addon-service/api/v1";
+
+enum AddonParameterValueType {
+    unknown_value_type = 0;
+    string = 1;
+    boolean = 2;
+    number = 3;
+    cidr = 4;
+    resource = 5;
+    resource_required = 6;
+}
+
+enum AddonRequirementResourceType {
+    unknown_resource_type = 0;
+    cluster = 1;
+    addon = 2;
+    machine_pool = 3;
+}
+
+enum AddonInstallMode {
+    unknown_install_mode = 0;
+    single_namespace = 1;
+    own_namespace = 2;
+    all_namespaces = 3;
+}
+
+message Addon {
+
+    // Unique identifier for the Addon object
+    string id = 1;
+
+    // Name of the Addon.
+    string name = 2;
+
+    // Description of the Addon
+    string description = 3;
+
+    // Link to documentation about the add-on.
+    string docs_link = 4;
+
+    // Label used to attach to a cluster deployment when add-on is installed.
+    string label = 5;
+
+    // Base64-encoded icon representing an add-on. The icon should be in PNG format.
+    string icon = 6;
+
+    // Indicates if this add-on can be added to clusters.
+    bool enabled = 7;
+
+    // Used to determine from where to reserve quota for this add-on.
+    string resource_name = 8;
+
+    // Used to determine how many units of quota an add-on consumes per resource name.
+    float resource_cost = 9;
+
+    // The namespace in which the addon CRD exists.
+    string target_namespace = 10;
+
+    // Representation of an add-on InstallMode field.
+    AddonInstallMode install_mode = 11;
+
+    // The name of the operator installed by this add-on.
+    string operator_name = 12;
+
+    // Indicates if this add-on is hidden.
+    bool hidden = 13;
+
+    // Indicates if this add-on has external resources associated with it
+    bool has_external_resources = 14;
+
+    // The name of the service account used when authenticating.
+    string service_account = 15;
+
+    // Name of the secret that will hold the credentials required to access cloud resources.
+    string credentials_secret = 16;
+
+    // List of policy permissions needed to access cloud resources.
+    repeated string policy_permissions = 17;
+
+    // Indicates if add-on is part of a managed service.
+    bool managed_service = 18;
+
+    // List of Addon parameters.
+    repeated AddonParameter parameters = 19;
+
+    // List of Addon requirements.
+    repeated AddonRequirement requirements = 20;
+
+    // List of Addon SubOperators
+    repeated AddonSubOperator sub_operators = 21;
+
+    // Addon configuration
+    AddonConfig config = 22;
+}
+
+message AddonParameter {
+
+    // Unique identifier for the Addon parameter
+    string id = 1;
+
+    // Name of the Addon parameter
+    string name = 2;
+
+    // Description of the Addon parameter
+    string description = 3;
+
+    // Type of value of the add-on parameter.
+    AddonParameterValueType value_type = 4;
+
+    // Validation rule for the add-on parameter.
+    string validation = 5;
+
+    // Error message to return should the parameter be invalid.
+    string validation_err_message = 6;
+
+    // Indicates if this parameter is required by the add-on.
+    bool required = 7;
+
+    // Indicates if this parameter can be edited after creation.
+    bool editable = 8;
+
+    // Indicates if this parameter is enabled for the add-on.
+    bool enabled = 9;
+
+    // TIndicates the value default for the add-on parameter.
+    string default_value = 10;
+
+    // List of options for the add-on parameter value.
+    repeated AddonParameterOption options = 11;
+}
+
+message AddonParameterOption {
+
+    // Name of Addon parameter option
+    string name = 1;
+
+    // Value of Addon parameter option
+    string value = 2;
+
+    // Requirements for the Addon parameter
+    repeated AddonRequirement requirements = 3;
+}
+
+message AddonRequirement {
+
+    // ID of the add-on requirement.
+    string id = 1;
+
+    // Type of resource of the add-on requirement.
+    AddonRequirementResourceType resource = 2;
+
+    // Data for the add-on requirement.
+    map<string,google.protobuf.Any> data = 3;
+
+    // Representation of an add-on requirement status.
+    AddonResourceRequirementStatus status = 4;
+
+    // Indicates if this requirement is enabled for the add-on.
+    bool enabled = 5;
+}
+
+message AddonSubOperator {
+
+    // Name of the add-on sub operator
+    string operator_name = 1;
+
+    // 	Namespace of the add-on sub operator
+    string operator_namespace = 2;
+
+    // Indicates if the sub operator is enabled for the add-on
+    bool enabled = 3;
+}
+
+message AddonResourceRequirementStatus {
+
+    // Indicates if the resource requirement is fullfilles.
+    bool fullfilled = 1;
+
+    // Indicated the errors for fulfilling this confition, if any.
+    repeated string error_msgs = 2;
+}
+
+message AddonConfig {
+    
+    // List of environment variables.
+    repeated AddonEnvironmentVariable add_on_environment_variables = 1;
+}
+
+message AddonEnvironmentVariable {
+
+    // ID of the environment variable
+    string id = 1;
+
+    // Name of the environment variable
+    string name = 2;
+
+    // Value of the environment variable
+    string value = 3;
+}
+
+message AddonCreateRequest {
+
+    // Addon to create
+    Addon addon = 1;
+}
+
+message AddonCreateResponse {
+
+    // ID of the created Addon
+    string id = 1;
+}
+
+message AddonReadRequest {
+
+    // ID of the Addon to read
+    string id = 1;
+}
+
+message AddonReadResponse {
+
+    // Read Addon
+    Addon addon = 1;
+}
+
+message AddonListResponse {
+
+    // List of returned Addons
+    repeated Addon addons = 1;
+}
+
+message AddonUpdateRequest {
+
+    // Addon to update
+    Addon addon = 1;
+}
+
+message AddonUpdateResponse {
+
+    // Updated Addon
+    Addon Addon = 1;
+}
+
+message AddonDeleteRequest {
+
+    // ID of the Addon to delete
+    string id = 1;
+}
+
+message AddonDeleteResponse {
+
+    // ID of the deleted Addon
+    string id = 1;
+}
+
+service AddonService {
+    // List all Addons
+    rpc List(google.protobuf.Empty) returns (AddonListResponse) {
+        option (google.api.http) = {
+            get: "/v1/addons"
+        };
+    }
+
+    // Create new Addon
+    rpc Create(AddonCreateRequest) returns (AddonCreateResponse) {
+        option (google.api.http) = {
+            post: "/v1/addons"
+            body: "*"
+        };
+    }
+
+    // Read single Addon
+    rpc Read(AddonReadRequest) returns (AddonReadResponse) {
+        option (google.api.http) = {
+            get: "/v1/addons/{id}"
+        };
+    }
+
+    // Delete single Addon
+    rpc Delete(AddonDeleteRequest) returns (AddonDeleteResponse) {
+        option (google.api.http) = {
+            delete: "/v1/addons/{id}"
+        };
+    }
+
+    // Update single Addon
+    rpc Update(AddonUpdateRequest) returns (AddonUpdateResponse) {
+        option (google.api.http) = {
+            put: "/v1/addons/{addon.id}"
+            body: "*"
+        };
+    }
+
+}
